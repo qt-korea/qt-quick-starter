@@ -1,0 +1,28 @@
+/* =============================================================================
+ *  ui-kit.qmlproject
+ *
+ *  Pure QML UI kit — runs on the host WITHOUT a build step.
+ *
+ *  $ qml previews/AppPreview.qml
+ *
+ *  Or open this file in Qt Design Studio.
+ *
+ *  RULE: No project-owned C++ modules may be referenced from this folder.
+ *  Enforced by scripts/check-ui-kit-purity.sh.
+ * ============================================================================= */
+
+import QmlProject
+
+Project {
+    mainFile: "previews/AppPreview.qml"
+
+    QmlFiles { directory: "components" }
+    QmlFiles { directory: "forms" }
+    QmlFiles { directory: "views" }
+    QmlFiles { directory: "previews" }
+
+    importPaths: [ "." ]
+
+    qt6Project: true
+    qtForMCUs: false
+}
