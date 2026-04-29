@@ -1,7 +1,7 @@
 import QtQuick
 
 import App.UiKit
-import App.ViewModels
+import App.Core
 
 Window {
     width: 480
@@ -11,6 +11,7 @@ Window {
 
     AppShell {
         anchors.fill: parent
-        viewModel: AppDataViewModel
+        navigator: ViewNavigator     // QML_SINGLETON from App.Core
+        initialRoute: "View1"
     }
 }

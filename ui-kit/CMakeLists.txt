@@ -15,6 +15,7 @@ qt_add_qml_module(ui_kit_module
         forms/View3Form.ui.qml
 
         # Views (ViewModel binding + navigation)
+        views/ViewBase.qml
         views/View1.qml
         views/View2.qml
         views/View3.qml

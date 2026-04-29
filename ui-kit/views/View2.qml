@@ -3,19 +3,17 @@ import QtQuick.Controls
 
 import "../forms"
 
-View2Form {
+ViewBase {
     id: root
 
-    required property var viewModel
+    View2Form {
+        anchors.fill: parent
 
-    StackView.onActivated: {
-        console.log("[View2] entered | value =", viewModel.value,
-                    "| lastVisitedPage =", viewModel.lastVisitedPage)
-        viewModel.notifyPageEntered("View2")
+        statusText: "value: " + root.viewModel.value
+                  + "  |  " + root.viewModel.status
+                  + "  |  enters: " + root.viewModel.enterCount
+
+        backBtn.onClicked:    root.StackView.view.pop()
+        goView3Btn.onClicked: root.StackView.view.pushRoute("View3")
     }
-
-    statusText:           "value: " + viewModel.value + "  |  " + viewModel.status
-    backBtn.onClicked:    root.StackView.view.pop()
-    goView3Btn.onClicked: root.StackView.view.push(Qt.resolvedUrl("View3.qml"),
-                                                    { viewModel: root.viewModel })
 }

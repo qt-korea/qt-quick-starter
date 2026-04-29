@@ -17,25 +17,27 @@ This template gives you, on day one:
    folder is a self-contained `.qmlproject` that Qt Design Studio (and Figma2Qt)
    can open directly, *and* the same files compile into your main CMake project
    as a proper QML module. One source of truth, two valid entry points.
-4. **A CMake reference for QML modules** — four small `CMakeLists.txt` files
+4. **A CMake reference for QML modules** — five small `CMakeLists.txt` files
    showing how to use `qt_add_qml_module`, how to keep dependencies
    one-directional, and how to wire a QML-only module to a C++ module to an
-   executable. If you have ever stared at `qt_add_qml_module` documentation
-   and wondered "but where do I put it in my project?" — this template
-   answers that.
-5. **A way in for teams that find CMake hard** — the four CMake files are
-   short, commented, and follow the same pattern. You can copy them, rename
-   them, and grow your project from there without becoming a CMake expert
-   first.
+   executable.
+5. **A clear infrastructure / demo split** — the reusable plumbing
+   (`ViewNavigator`, `ViewModelBase`, `AppServices`) lives in its own
+   `core/` folder and is meant to be depended on, not edited. The other
+   folders (`domain/`, `viewmodels/`, `ui-kit/`, `app-main/`) demonstrate
+   how to *use* `core/` and are meant to be replaced or extended with your
+   own code. The folder boundary tells you which is which.
+6. **One ViewModel per page, instantiated automatically** — each `View*.qml`
+   has a matching `View*ViewModel` C++ class. The `ViewNavigator` constructs
+   the right ViewModel for each page and hands it to the View. Add a page =
+   add one View, one ViewModel, and one line in the route table. The
+   ViewModel exposes six lifecycle hooks (`onInitialize`, `onActivating`,
+   `onActivated`, `onDeactivating`, `onDeactivated`, `onFinalize`) wired to
+   the StackView page lifecycle, so C++ resource preparation and cleanup is
+   synchronised with what the user is actually seeing.
 
-This is not a finished application. It is roughly 30 files of scaffolding,
+This is not a finished application. It is a small amount of scaffolding,
 deliberately minimal, designed to be the first commit of a real project.
-
-> **Larger project?** A sibling branch — `feature/routed-viewmodels` —
-> applies the same structural rules but with one ViewModel per page,
-> a small `ViewNavigator`, and a services-injection pattern. Reach for
-> it when your page count starts to make a single shared ViewModel feel
-> crowded. See "Growing from here" at the bottom of this document.
 
 ---
 
@@ -75,10 +77,11 @@ have no obvious starting answer:
 - **"How do I connect Figma / Qt Design Studio output to my actual CMake build?"**
 - **"How do I structure `qt_add_qml_module` for more than one module?"**
 - **"How do I split QML and C++ into folders without breaking imports?"**
+- **"How do I avoid one giant ViewModel singleton owning the state of every screen?"**
+- **"Which parts of the starter is *infrastructure I should keep* and which are
+  *demo code I should replace*?"**
 
-This template answers all of these in one consistent structure. The same folder
-layout that gives you UI preview also gives you the Figma bridge, the CMake
-module example, and the layered structure that scales.
+This template answers all of these in one consistent structure.
 
 ---
 
@@ -89,32 +92,62 @@ module example, and the layered structure that scales.
 │                                                               │
 │   forms/    Pure QML layouts — preview-able standalone        │
 │      ↑  property alias bindings                               │
-│   views/    ViewModel binding + StackView navigation          │
+│   views/    ViewModel binding + StackView.pushRoute()         │
 │                                                               │
 │   ui-kit.qmlproject  ← Qt Design Studio / Figma2Qt opens this │
 └───────────────────────────┬───────────────────────────────────┘
                             │  required property var viewModel
-                ┌───────────▼────────────┐
-                │      viewmodels/        │  C++ QML_SINGLETON
-                └───────────┬────────────┘
-                            │  bindDataSource()
-                ┌───────────▼────────────┐
-                │       domain/           │  Pure C++
-                └────────────────────────┘
+                            │  (one fresh ViewModel per push)
+                ┌───────────▼────────────────┐
+                │      viewmodels/            │  C++, one class per view
+                │      View1/2/3 ViewModel    │  (derived from ViewModelBase)
+                └───────────┬────────────────┘
+                            │  built by ViewNavigator
+                ┌───────────▼────────────────┐
+                │   core/ (infrastructure)    │  ViewNavigator + ViewModelBase
+                │                             │  + AppServices struct
+                └───────────┬────────────────┘
+                            │  shared instances
+                ┌───────────▼────────────────┐
+                │       domain/               │  Pure C++ (e.g. AppDataSource)
+                └────────────────────────────┘
 
-        app-main/  →  entry point, wires viewmodels ↔ domain
+        app-main/  →  entry point, declares routes, wires services into the
+                      ViewNavigator from core/
 
-        Each box = its own CMakeLists.txt (4 files total)
+        Each box = its own CMakeLists.txt (5 files total)
 ```
 
-The sample is intentionally small — three pages in a `StackView`
-(`View1` → `View2` → `View3`), one value property, one status string, a few
-log messages. The structure is the product; the sample exists only to make
-the structure easy to see and to copy.
+The infrastructure (`core/`) is meant to be left alone. The other folders
+(`domain/`, `viewmodels/`, `ui-kit/`, `app-main/`) contain a small working
+sample: three pages in a `StackView` (`View1` → `View2` → `View3`), each
+with its own ViewModel. Every page shows the same shared `value`/`status`
+(from the domain) plus its own `enterCount` (page-scoped state). The
+sample exists only to make the structure easy to see and to copy —
+delete or replace it as you grow your real application.
 
-The ViewModel exposes three properties (`value`, `status`, `lastVisitedPage`)
-and one invokable method (`notifyPageEntered`). They are logged to the
-console on every page transition so you can see the property flow end-to-end.
+---
+
+## How a page is built — the one-page tour
+
+When the user taps "Go to View 2":
+
+1. The button calls `StackView.view.pushRoute("View2")`.
+2. `AppShell` asks the `ViewNavigator` to resolve `"View2"`.
+3. `ViewNavigator` constructs a new `View2ViewModel`, passing the
+   `AppServices` bundle (a struct of pointers to shared domain instances)
+   by const reference to its constructor.
+4. `ViewNavigator` returns `{ url, viewModel }` to QML.
+5. `AppShell` calls `StackView.push(url, { viewModel })`.
+6. `View2.qml`'s `required property var viewModel` is satisfied by the
+   freshly-built object. Property bindings start working immediately.
+
+When the user pops back to View 1, the View 2 object is destroyed and
+the JavaScript GC reclaims its `View2ViewModel` shortly after. Pushing
+View 2 again creates a new instance with `enterCount` back to 1.
+
+The shared domain instances inside `AppServices` (the page-shared state)
+keep running independently of any view.
 
 ---
 
@@ -162,30 +195,46 @@ and one project at a time. Here it is the default.
 
 ---
 
-## The four `CMakeLists.txt` files — a working reference
+## The five `CMakeLists.txt` files — a working reference
 
-The whole project has exactly four CMake files, one per layer, each
-following the same pattern. Reading them in order is a short tutorial on
-modern Qt 6 CMake:
+The whole project has exactly five CMake files, one per layer, each
+following the same pattern:
 
 | File | What it shows |
 |---|---|
+| `core/CMakeLists.txt` | A C++ QML module containing the reusable infrastructure (`ViewNavigator` `QML_SINGLETON`, `ViewModelBase` abstract type, `AppServices` struct). |
 | `domain/CMakeLists.txt` | A pure C++ static library — the simplest possible Qt CMake target. |
-| `viewmodels/CMakeLists.txt` | A C++ QML module via `qt_add_qml_module` with `QML_SINGLETON` registration. |
+| `viewmodels/CMakeLists.txt` | A C++ QML module via `qt_add_qml_module` with `QML_UNCREATABLE` page-scoped ViewModels. |
 | `ui-kit/CMakeLists.txt` | A pure-QML module via `qt_add_qml_module` — no C++ link dependencies, only QML and resource files. |
-| `app-main/CMakeLists.txt` | The `qt_add_executable` target that pulls all three modules together. |
+| `app-main/CMakeLists.txt` | The `qt_add_executable` target that pulls all four modules together and provides the `App.Integration` QML entry module. |
 
-The dependency arrow goes one way only: `domain → viewmodels → app-main`,
-with `ui-kit` consumed by `app-main` as a QML module. No layer depends on
-the layer above it. Each `CMakeLists.txt` is short enough to read in one
-sitting, commented to explain *why* each line is there, and named so you can
-copy any of them as a starting point for a new module of your own.
+The dependency arrow goes one way only:
 
-If your team has been writing Qt projects with one giant `CMakeLists.txt`
-at the top and `find_package(Qt6 ...)` scattered around, this is what the
-modular alternative looks like.
+```text
+core ◄── domain
+core ◄── viewmodels ◄── domain
+core ◄── app-main ◄── viewmodels ◄── domain
+ui-kit (consumed by app-main as a QML module — no project-owned C++ link)
+```
+
+No layer depends on the layer above it.
 
 ---
+
+## Naming convention
+
+This template follows the **Qt convention of avoiding C++ namespaces**.
+Type names are unique on their own — `ViewNavigator`, `ViewModelBase`,
+`AppServices`, `AppDataSource`, `View1ViewModel`, etc. Cross-folder
+collisions are prevented by giving types specific, descriptive names
+rather than relying on namespaces.
+
+The **infrastructure / demo line is drawn by the folder, not by a
+namespace**. `core/` is reusable infrastructure; everything else is
+demonstration code you are expected to replace or extend.
+
+---
+
 ## Quick start
 
 ### Preview the UI on your laptop — no build
@@ -195,8 +244,8 @@ cd ui-kit
 qml forms/View1Form.ui.qml
 ```
 
-Or open `ui-kit/ui-kit.qmlproject` in Qt Design Studio, Qt Creator for a richer
-preview environment with live edit.
+Or open `ui-kit/ui-kit.qmlproject` in Qt Design Studio or Qt Creator for a
+richer preview environment with live edit.
 
 ---
 
@@ -208,15 +257,23 @@ qt-quick-starter/
 ├── ARCHITECTURE.md
 ├── CMakeLists.txt                  # top-level
 │
+├── core/                           # ◄ Reusable infrastructure — do not edit
+│   ├── ViewNavigator.h             #   route table + ViewModel factory
+│   ├── ViewNavigator.cpp           #   (QML_SINGLETON in App.Core)
+│   ├── ViewModelBase.h             #   abstract base for page ViewModels
+│   ├── AppServices.h               #   struct of pointers — extend as you grow
+│   └── CMakeLists.txt              #   qt_add_qml_module (URI: App.Core)
+│
 ├── ui-kit/                         # Pure QML — designer-friendly
 │   ├── ui-kit.qmlproject           # Qt Design Studio / Figma2Qt entry
 │   ├── CMakeLists.txt              # qt_add_qml_module (QML-only)
-│   ├── AppShell.qml                # StackView host
+│   ├── AppShell.qml                # StackView host + pushRoute helper
 │   ├── forms/                      # Pure QML layouts (preview-able)
 │   │   ├── View1Form.ui.qml
 │   │   ├── View2Form.ui.qml
 │   │   └── View3Form.ui.qml
 │   ├── views/                      # ViewModel binding + navigation
+│   │   ├── ViewBase.qml            # base type — wires lifecycle hooks
 │   │   ├── View1.qml
 │   │   ├── View2.qml
 │   │   └── View3.qml
@@ -226,12 +283,13 @@ qt-quick-starter/
 │
 ├── app-main/                       # Entry point — wires everything
 │   ├── Main.qml
-│   ├── main.cpp
-│   └── CMakeLists.txt              # qt_add_executable
+│   ├── main.cpp                    # declares the route table
+│   └── CMakeLists.txt              # qt_add_executable + App.Integration
 │
-├── viewmodels/                     # C++ ViewModels (QML_SINGLETON)
-│   ├── AppDataViewModel.h
-│   ├── AppDataViewModel.cpp
+├── viewmodels/                     # C++ ViewModels (one per view)
+│   ├── View1ViewModel.h/.cpp
+│   ├── View2ViewModel.h/.cpp
+│   ├── View3ViewModel.h/.cpp
 │   └── CMakeLists.txt              # qt_add_qml_module (with C++)
 │
 ├── domain/                         # Pure C++ domain state
@@ -239,7 +297,15 @@ qt-quick-starter/
 │   ├── AppDataSource.cpp
 │   └── CMakeLists.txt              # plain C++ library
 │
-└── tests/                          # Domain + UI tests
+└── tests/                          # Host-runnable tests
+    ├── domain/                     # plain QtTest — domain logic
+    │   └── tst_app_datasource.cpp
+    ├── viewmodels/                 # plain QtTest — VM behaviour + AppServices
+    │   └── tst_view1_viewmodel.cpp
+    ├── ui-visual/                  # QtQuickTest — form layout assertions
+    │   ├── main.cpp
+    │   └── tst_ui_kit.qml
+    └── CMakeLists.txt
 ```
 
 ---
@@ -249,58 +315,34 @@ qt-quick-starter/
 This template is intentionally **minimal scaffolding**. The common ways to
 extend it:
 
-- **Add a new property.** Add it to `AppDataViewModel.h/.cpp` and bind it
-  in the relevant `ui-kit/views/` file. No interface file to keep in sync,
-  no mock to maintain.
-- **Add a new page.** Create `View4Form.ui.qml` in `ui-kit/forms/`, then
-  `View4.qml` in `ui-kit/views/`. Register both in
-  `ui-kit/CMakeLists.txt`. Push to it from a view via
-  `StackView.view.push(Qt.resolvedUrl(...))`.
+- **Add a new property to an existing page.** Add it to that page's
+  `View*ViewModel.h/.cpp` and bind it in the matching `ui-kit/views/`
+  file. No interface file to keep in sync, no mock to maintain.
+- **Add a new page.** Three steps:
+  1. Create `ViewNForm.ui.qml` in `ui-kit/forms/` and `ViewN.qml` in
+     `ui-kit/views/`. Register both in `ui-kit/CMakeLists.txt`.
+  2. Create `ViewNViewModel.h/.cpp` in `viewmodels/` deriving from
+     `ViewModelBase`. Register them in `viewmodels/CMakeLists.txt`.
+  3. Add one `navigator->registerRoute<ViewNViewModel>("ViewN", QUrl(...))`
+     line in `app-main/main.cpp`.
+
+  Then push to it from any view via
+  `StackView.view.pushRoute("ViewN")`. No QML imports change.
 - **Add a new C++ module.** Copy `viewmodels/CMakeLists.txt`, rename the
   module URI, register your new types. The pattern is the same for every
   C++ QML module you will ever add.
 - **Connect a real data source.** Write a class under `domain/` (a database,
-  a network client, a vendor API), and wire it in
-  `AppDataViewModel::bindDataSource` exactly the way the current
-  `AppDataSource` is wired.
+  a network client, a vendor API), forward-declare it in
+  `core/AppServices.h` and add one `Foo *foo = nullptr;` line to the
+  `AppServices` struct, then allocate it in `main.cpp` and assign it to
+  `services.foo`. Every ViewModel that wants to consume it reads
+  `m_services.foo`. No `core/` change beyond the one-line struct member,
+  no `registerRoute<T>()` change, no signature change to other VMs. See
+  `ARCHITECTURE.md` → "Wiring domain services" for the full worked
+  example.
 
 Through all of these, `ui-kit/forms/` keeps loading in `qml` and in Qt
 Design Studio. The designer's workflow is not blocked by the C++ work, and
 the C++ work is not blocked by the design iteration.
-
-### When `main` is not enough — the `feature/routed-viewmodels` branch
-
-The single-singleton ViewModel pattern on this branch is the smallest
-thing that works. It scales well to roughly five or six pages. Past
-that, two failure modes typically appear:
-
-- **Merge conflict gravity.** Every page's properties live in one
-  `AppDataViewModel` class. As the page count grows, the ViewModel file
-  becomes the most-edited file in the project, and unrelated work
-  collides there.
-- **Page-scoped state has nowhere to live.** A counter, a draft, a
-  per-page selection — there is no clean home for it. It either pollutes
-  the shared ViewModel or leaks into QML state.
-
-The sibling branch `feature/routed-viewmodels` applies the same
-structural rules (UI / logic split, host-testable UI, Figma bridge,
-modular CMake) but replaces the single ViewModel with:
-
-- One `View*ViewModel` C++ class per page, derived from `ViewModelBase`,
-  instantiated by a small `ViewNavigator` on each `pushRoute()` call.
-- Six lifecycle hooks (`onInitialize`, `onActivating`, `onActivated`,
-  `onDeactivating`, `onDeactivated`, `onFinalize`) so C++ resource
-  setup and teardown synchronise with what the user is actually seeing.
-- An `AppServices` struct that bundles long-lived domain pointers, so
-  adding a new domain class does not change any ViewModel constructor
-  signature.
-- A `core/` folder that holds the reusable infrastructure separately
-  from demo code.
-
-It is more code (~50 files instead of ~30) and more vocabulary to learn.
-It earns its weight only when the project actually has many pages.
-**Stay on this branch if your project has a small number of pages and
-a shared state model. Switch to `feature/routed-viewmodels` when you
-start feeling the symptoms above.**
 
 ---

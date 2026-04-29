@@ -3,17 +3,16 @@ import QtQuick.Controls
 
 import "../forms"
 
-View3Form {
+ViewBase {
     id: root
 
-    required property var viewModel
+    View3Form {
+        anchors.fill: parent
 
-    StackView.onActivated: {
-        console.log("[View3] entered | value =", viewModel.value,
-                    "| lastVisitedPage =", viewModel.lastVisitedPage)
-        viewModel.notifyPageEntered("View3")
+        statusText: "value: " + root.viewModel.value
+                  + "  |  " + root.viewModel.status
+                  + "  |  enters: " + root.viewModel.enterCount
+
+        backBtn.onClicked: root.StackView.view.pop()
     }
-
-    statusText:        "value: " + viewModel.value + "  |  " + viewModel.status
-    backBtn.onClicked: root.StackView.view.pop()
 }

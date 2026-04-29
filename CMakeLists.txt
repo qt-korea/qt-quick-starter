@@ -22,6 +22,11 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 option(BUILD_TESTING "Build unit and UI tests" ON)
 
+# Reusable infrastructure (treat as a small in-tree library):
+#   ViewModelBase, AppServices, ViewNavigator
+add_subdirectory(core)
+
+# Demonstration code — replace or extend with your own:
 add_subdirectory(domain)
 add_subdirectory(viewmodels)
 add_subdirectory(ui-kit)

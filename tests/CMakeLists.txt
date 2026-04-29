@@ -9,6 +9,20 @@ target_link_libraries(tst_app_datasource
 )
 add_test(NAME tst_app_datasource COMMAND tst_app_datasource)
 
+# ── ViewModel unit test (no display needed) ──────────────────────────────────
+#
+#   Proves the AppServices injection pattern documented in
+#   ARCHITECTURE.md → "Wiring domain services": each test constructs only
+#   the services it needs, no globals to reset between tests, no display.
+#
+qt_add_executable(tst_view1_viewmodel
+    viewmodels/tst_view1_viewmodel.cpp
+)
+target_link_libraries(tst_view1_viewmodel
+    PRIVATE Qt6::Test app_core app_domain app_viewmodels
+)
+add_test(NAME tst_view1_viewmodel COMMAND tst_view1_viewmodel)
+
 # ── UI visual test via QtQuickTest ───────────────────────────────────────────
 qt_add_executable(tst_ui_kit
     ui-visual/main.cpp

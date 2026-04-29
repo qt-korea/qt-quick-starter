@@ -3,18 +3,16 @@ import QtQuick.Controls
 
 import "../forms"
 
-View1Form {
+ViewBase {
     id: root
 
-    required property var viewModel
+    View1Form {
+        anchors.fill: parent
 
-    StackView.onActivated: {
-        console.log("[View1] entered | value =", viewModel.value,
-                    "| status =", viewModel.status)
-        viewModel.notifyPageEntered("View1")
+        statusText: "value: " + root.viewModel.value
+                  + "  |  " + root.viewModel.status
+                  + "  |  enters: " + root.viewModel.enterCount
+
+        goView2Btn.onClicked: root.StackView.view.pushRoute("View2")
     }
-
-    statusText: "value: " + viewModel.value + "  |  " + viewModel.status
-    goView2Btn.onClicked: root.StackView.view.push(Qt.resolvedUrl("View2.qml"),
-                                                   { viewModel: root.viewModel })
 }

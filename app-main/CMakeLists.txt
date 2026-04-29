@@ -13,6 +13,7 @@ qt_add_qml_module(qt-quick-starter
         QtQuick
         QtQuick.Controls
         App.UiKit
+        App.Core
         App.ViewModels
 )
 
@@ -22,6 +23,7 @@ target_link_libraries(qt-quick-starter
         Qt6::Qml
         Qt6::Quick
         Qt6::QuickControls2
+        app_core
         app_domain
         app_viewmodels
         ui_kit_module

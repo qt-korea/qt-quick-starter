@@ -4,8 +4,14 @@ qt_add_qml_module(app_viewmodels
     OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml/App/ViewModels"
 
     SOURCES
-        AppDataViewModel.h
-        AppDataViewModel.cpp
+        View1ViewModel.h
+        View1ViewModel.cpp
+
+        View2ViewModel.h
+        View2ViewModel.cpp
+
+        View3ViewModel.h
+        View3ViewModel.cpp
 )
 
 target_link_libraries(app_viewmodels
@@ -13,6 +19,7 @@ target_link_libraries(app_viewmodels
         Qt6::Core
         Qt6::Qml
         app_domain
+        app_core
 )
 
 target_include_directories(app_viewmodels
