@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 
 project(QtQuickStarter
     VERSION 0.1.0
-    DESCRIPTION "Qt Quick Starter Application"
+    DESCRIPTION "Qt Quick Starter Kit"
     LANGUAGES CXX
 )
 

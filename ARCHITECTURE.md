@@ -81,7 +81,7 @@ all views. That is the simplest thing that works, and it scales well
 to roughly five or six pages.
 
 For projects that grow past that point, see the sibling branch
-`feature/routed-viewmodels`. It applies the same structural rules
+`view-navigator`. It applies the same structural rules
 (UI / logic split, host-testable UI, Figma bridge, modular CMake) but
 replaces the single ViewModel with one ViewModel per page, a small
 `ViewNavigator` that constructs them on push, lifecycle hooks, and an

@@ -1,4 +1,4 @@
-# Qt Quick Starter Application
+# Qt Quick Starter Kit
 
 A Qt 6 starter template for developers beginning a new Qt Quick project — especially
 those new to Qt who need a credible, working starting point rather than an empty
@@ -31,11 +31,11 @@ This template gives you, on day one:
 This is not a finished application. It is roughly 30 files of scaffolding,
 deliberately minimal, designed to be the first commit of a real project.
 
-> **Larger project?** A sibling branch — `feature/routed-viewmodels` —
-> applies the same structural rules but with one ViewModel per page,
-> a small `ViewNavigator`, and a services-injection pattern. Reach for
-> it when your page count starts to make a single shared ViewModel feel
-> crowded. See "Growing from here" at the bottom of this document.
+> **Larger project?** A sibling branch — `view-navigator` — applies the
+> same structural rules but with one ViewModel per page, a small
+> `ViewNavigator`, and a services-injection pattern. Reach for it when
+> your page count starts to make a single shared ViewModel feel crowded.
+> See "Growing from here" at the bottom of this document.
 
 ---
 
@@ -268,7 +268,7 @@ Through all of these, `ui-kit/forms/` keeps loading in `qml` and in Qt
 Design Studio. The designer's workflow is not blocked by the C++ work, and
 the C++ work is not blocked by the design iteration.
 
-### When `main` is not enough — the `feature/routed-viewmodels` branch
+### When `main` is not enough — the `view-navigator` branch
 
 The single-singleton ViewModel pattern on this branch is the smallest
 thing that works. It scales well to roughly five or six pages. Past
@@ -282,9 +282,9 @@ that, two failure modes typically appear:
   per-page selection — there is no clean home for it. It either pollutes
   the shared ViewModel or leaks into QML state.
 
-The sibling branch `feature/routed-viewmodels` applies the same
-structural rules (UI / logic split, host-testable UI, Figma bridge,
-modular CMake) but replaces the single ViewModel with:
+The sibling branch `view-navigator` applies the same structural rules
+(UI / logic split, host-testable UI, Figma bridge, modular CMake) but
+replaces the single ViewModel with:
 
 - One `View*ViewModel` C++ class per page, derived from `ViewModelBase`,
   instantiated by a small `ViewNavigator` on each `pushRoute()` call.
@@ -300,7 +300,7 @@ modular CMake) but replaces the single ViewModel with:
 It is more code (~50 files instead of ~30) and more vocabulary to learn.
 It earns its weight only when the project actually has many pages.
 **Stay on this branch if your project has a small number of pages and
-a shared state model. Switch to `feature/routed-viewmodels` when you
-start feeling the symptoms above.**
+a shared state model. Switch to `view-navigator` when you start feeling
+the symptoms above.**
 
 ---
