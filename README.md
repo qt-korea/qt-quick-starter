@@ -1,5 +1,7 @@
 # Qt Quick Starter Kit
 
+*한국어 버전 → [README.ko.md](README.ko.md)*
+
 A Qt 6 starter template for developers beginning a new Qt Quick project — especially
 those new to Qt who need a credible, working starting point rather than an empty
 `main.qml`.
