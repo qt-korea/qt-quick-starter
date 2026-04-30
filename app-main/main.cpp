@@ -16,25 +16,26 @@ int main(int argc, char **argv)
 
     QQmlApplicationEngine engine;
 
-    // TODO: Revisit this manual QML import path once the startup script configures QML imports.
-    engine.addImportPath(QDir(app.applicationDirPath()).absoluteFilePath(QStringLiteral("../qml")));
+    const QString qmlDir =
+        QDir(app.applicationDirPath()).absoluteFilePath(QStringLiteral("../qml"));
+    engine.addImportPath(qmlDir);
 
     auto *vm = engine.singletonInstance<AppDataViewModel *>(
         "App.ViewModels", "AppDataViewModel");
 
     if (!vm) {
-        qCritical() << "[main] Failed to obtain AppDataViewModel singleton";
+        qCritical() << "[main] Failed to obtain AppDataViewModel singleton."
+                    << "QML import path was:" << qmlDir;
         return -1;
     }
 
-    // The data source is parented to the QGuiApplication so it lives for
-    // the entire process and is destroyed in the right order at shutdown.
     vm->bindDataSource(new AppDataSource(&app));
 
     engine.loadFromModule("App.Integration", "Main");
 
     if (engine.rootObjects().isEmpty()) {
-        qCritical() << "[main] Failed to load QML root — aborting";
+        qCritical() << "[main] Failed to load QML root — aborting."
+                    << "QML import path was:" << qmlDir;
         return -1;
     }
 

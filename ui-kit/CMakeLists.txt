@@ -6,15 +6,12 @@ qt_add_qml_module(ui_kit_module
     QML_FILES
         AppShell.qml
 
-        # Components (reusable UI primitives)
         components/AppButton.qml
 
-        # Forms (pure layout)
         forms/View1Form.ui.qml
         forms/View2Form.ui.qml
         forms/View3Form.ui.qml
 
-        # Views (ViewModel binding + navigation)
         views/View1.qml
         views/View2.qml
         views/View3.qml
@@ -31,4 +28,14 @@ target_link_libraries(ui_kit_module
     PRIVATE
         Qt6::Quick
         Qt6::QuickControls2
+)
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/qml/App/UiKit/"
+    DESTINATION "${QQS_QML_INSTALL_DIR}/App/UiKit"
+    FILES_MATCHING
+        PATTERN "qmldir"
+        PATTERN "*.qmltypes"
+        PATTERN "*.so"
+        PATTERN "*.dylib"
+        PATTERN "*.dll"
 )

@@ -1,9 +1,3 @@
-// =============================================================================
-//  tests/domain/tst_app_datasource.cpp
-//
-//  Plain QtTest for AppDataSource — no display, no QML.
-// =============================================================================
-
 #include <QtTest/QtTest>
 #include <QSignalSpy>
 
