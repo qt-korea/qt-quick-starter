@@ -1,3 +1,4 @@
+#include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -14,6 +15,9 @@ int main(int argc, char **argv)
     QQuickStyle::setStyle(QStringLiteral("Material"));
 
     QQmlApplicationEngine engine;
+
+    // TODO: Revisit this manual QML import path once the startup script configures QML imports.
+    engine.addImportPath(QDir(app.applicationDirPath()).absoluteFilePath(QStringLiteral("../qml")));
 
     auto *vm = engine.singletonInstance<AppDataViewModel *>(
         "App.ViewModels", "AppDataViewModel");
