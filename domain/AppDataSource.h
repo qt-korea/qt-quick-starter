@@ -17,6 +17,7 @@
 #include <QString>
 #include <QTimer>
 
+// Not thread-safe — must remain on the GUI thread (QTimer constraint).
 class AppDataSource : public QObject
 {
     Q_OBJECT

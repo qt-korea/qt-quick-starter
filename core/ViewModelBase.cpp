@@ -17,36 +17,36 @@
 
 void ViewModelBase::onInitialize()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onInitialize  — load initial data, allocate buffers";
 }
 
 void ViewModelBase::onActivating()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onActivating  — page transition in";
 }
 
 void ViewModelBase::onActivated()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onActivated   — visible";
 }
 
 void ViewModelBase::onDeactivating()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onDeactivating— page transition out";
 }
 
 void ViewModelBase::onDeactivated()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onDeactivated — hidden (still alive)";
 }
 
 void ViewModelBase::onFinalize()
 {
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "onFinalize    — release resources, persist state";
 }

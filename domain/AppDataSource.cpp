@@ -5,11 +5,13 @@
 #include "AppDataSource.h"
 #include <QDebug>
 
+static constexpr int kTickIntervalMs = 1000;
+
 AppDataSource::AppDataSource(QObject *parent)
     : QObject(parent)
-    , m_timer(new QTimer(this))
+    , m_timer(new QTimer(this))  // parented to this, destroyed automatically
 {
-    m_timer->setInterval(1000);
+    m_timer->setInterval(kTickIntervalMs);
     connect(m_timer, &QTimer::timeout, this, &AppDataSource::onTick);
     m_timer->start();
 }

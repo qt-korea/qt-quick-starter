@@ -19,7 +19,7 @@ View3ViewModel::View3ViewModel(const AppServices &services, QObject *parent)
         connect(src,  &AppDataSource::statusChanged,
                 this, &View3ViewModel::statusChanged);
     }
-    qInfo().noquote() << "[" + objectName() + "] constructed";
+    qInfo().noquote() << '[' << objectName() << "] constructed";
 }
 
 int View3ViewModel::value() const
@@ -38,6 +38,6 @@ void View3ViewModel::onActivated()
     ViewModelBase::onActivated();
     ++m_enterCount;
     emit enterCountChanged();
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "  ↳ enter #" << m_enterCount;
 }

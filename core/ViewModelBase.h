@@ -90,6 +90,7 @@
 class ViewModelBase : public QObject
 {
     Q_OBJECT
+    Q_DISABLE_COPY_MOVE(ViewModelBase)
     QML_ELEMENT
     QML_UNCREATABLE("ViewModelBase is abstract — instances are created by the ViewNavigator.")
 

@@ -92,7 +92,7 @@ void TestView1ViewModel::emits_value_changed_when_data_source_ticks()
 
     src.onTick();
 
-    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.size(), 1);
 }
 
 // onActivated() is the lifecycle hook that increments enterCount and
@@ -110,7 +110,7 @@ void TestView1ViewModel::enter_count_increments_on_activation()
     vm.onActivated();
 
     QCOMPARE(vm.enterCount(), 3);
-    QCOMPARE(spy.count(),     3);
+    QCOMPARE(spy.size(),      3);
 }
 
 // Two VMs sharing the same services bundle must keep their page-scoped

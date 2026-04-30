@@ -27,7 +27,7 @@ View1ViewModel::View1ViewModel(const AppServices &services, QObject *parent)
         connect(src,  &AppDataSource::statusChanged,
                 this, &View1ViewModel::statusChanged);
     }
-    qInfo().noquote() << "[" + objectName() + "] constructed";
+    qInfo().noquote() << '[' << objectName() << "] constructed";
 }
 
 int View1ViewModel::value() const
@@ -46,6 +46,6 @@ void View1ViewModel::onActivated()
     ViewModelBase::onActivated();   // keep the diagnostic log line
     ++m_enterCount;
     emit enterCountChanged();
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "  ↳ enter #" << m_enterCount;
 }

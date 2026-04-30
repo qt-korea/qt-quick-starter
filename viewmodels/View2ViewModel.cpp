@@ -19,7 +19,7 @@ View2ViewModel::View2ViewModel(const AppServices &services, QObject *parent)
         connect(src,  &AppDataSource::statusChanged,
                 this, &View2ViewModel::statusChanged);
     }
-    qInfo().noquote() << "[" + objectName() + "] constructed";
+    qInfo().noquote() << '[' << objectName() << "] constructed";
 }
 
 int View2ViewModel::value() const
@@ -38,6 +38,6 @@ void View2ViewModel::onActivated()
     ViewModelBase::onActivated();
     ++m_enterCount;
     emit enterCountChanged();
-    qInfo().noquote() << "[" + objectName() + "]"
+    qInfo().noquote() << '[' << objectName() << ']'
                       << "  ↳ enter #" << m_enterCount;
 }
