@@ -19,6 +19,7 @@ T.Button {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment:   Text.AlignVCenter
         elide:               Text.ElideRight
+        textFormat:          Text.PlainText
     }
 
     background: Rectangle {

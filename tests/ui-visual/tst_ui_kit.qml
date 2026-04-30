@@ -3,6 +3,7 @@ import QtTest
 import App.UiKit
 
 Item {
+    id: root
     width: 480; height: 800
 
     View1Form { id: view1 }
