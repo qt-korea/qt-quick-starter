@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import App.Core
 
 // =============================================================================
 //  ViewBase.qml
@@ -43,9 +44,9 @@ import QtQuick.Controls
 //
 //  ui-kit purity
 //  ─────────────
-//  This file imports only standard Qt modules. It is loadable in the
-//  `qml` runtime and in Qt Design Studio without the project's C++
-//  build, exactly like every other file under ui-kit/.
+//  This file imports App.Core for ViewModelBase. The qml runtime and
+//  Qt Design Studio need App.Core on the import path (i.e. the project
+//  must be built before this file can be loaded in a design tool).
 // =============================================================================
 
 Item {
@@ -53,7 +54,7 @@ Item {
 
     // Injected by AppShell.pushRoute() → StackView.push(..., { viewModel })
     // when this View is pushed onto the stack.
-    required property var viewModel
+    required property ViewModelBase viewModel
 
     readonly property string statusSummary:
         "value: "    + viewModel.value
