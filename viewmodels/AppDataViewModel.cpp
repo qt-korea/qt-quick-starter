@@ -19,7 +19,8 @@ AppDataViewModel::AppDataViewModel(QObject *parent)
 
 void AppDataViewModel::bindDataSource(AppDataSource *source)
 {
-    if (source == nullptr) return;
+    Q_ASSERT(source != nullptr);
+    if (!source) return;
 
     m_source = source;
 

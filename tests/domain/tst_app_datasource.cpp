@@ -34,7 +34,7 @@ void TestAppDataSource::tick_increments_value_and_emits_signal()
     src.onTick();
 
     QCOMPARE(src.value(), 1);
-    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.size(), 1);
     QCOMPARE(spy.first().first().toInt(), 1);
 }
 
@@ -46,7 +46,7 @@ void TestAppDataSource::tick_updates_status_string()
     src.onTick();
 
     QCOMPARE(src.status(), QStringLiteral("tick #1"));
-    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.size(), 1);
 }
 
 void TestAppDataSource::multiple_ticks_accumulate()
