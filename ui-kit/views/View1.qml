@@ -9,10 +9,8 @@ ViewBase {
     View1Form {
         anchors.fill: parent
 
-        statusText: "value: " + root.viewModel.value
-                  + "  |  " + root.viewModel.status
-                  + "  |  enters: " + root.viewModel.enterCount
+        statusText: root.statusSummary
 
-        goView2Btn.onClicked: root.StackView.view.pushRoute("View2")
+        goView2Btn.onClicked: if (root.StackView.view) root.StackView.view.pushRoute("View2")
     }
 }

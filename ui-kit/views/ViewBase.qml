@@ -55,6 +55,11 @@ Item {
     // when this View is pushed onto the stack.
     required property var viewModel
 
+    readonly property string statusSummary:
+        "value: "    + viewModel.value
+        + "  |  "    + viewModel.status
+        + "  |  enters: " + viewModel.enterCount
+
     // ─── Lifecycle wiring ─────────────────────────────────────────────────
     Component.onCompleted:    viewModel.onInitialize()
     Component.onDestruction:  viewModel.onFinalize()

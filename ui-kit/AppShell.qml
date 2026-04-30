@@ -32,11 +32,13 @@ Item {
         // the freshly-built ViewModel via `initialProperties`.
         function pushRoute(name) {
             const r = root.navigator.resolveRoute(name)
-            if (!r || !r.url) {
+            if (!r || !r.url || !r.viewModel) {
                 console.warn("[AppShell] Unknown route:", name)
                 return null
             }
-            return push(r.url, { viewModel: r.viewModel })
+            const item = push(r.url, { viewModel: r.viewModel })
+            if (!item) console.error("[AppShell] push failed for route:", name)
+            return item
         }
 
         Component.onCompleted: pushRoute(root.initialRoute)

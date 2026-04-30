@@ -6,26 +6,28 @@ import "../components"
 Page {
     id: root
 
-    width: 480
-    height: 800
-
     property alias statusText: statusLabel.text
     property alias backBtn:    backBtn
+
+    width: 480
+    height: 800
 
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 24
 
         Label {
-            text: "View 3"
+            text:       "View 3"
             font.pixelSize: 32
-            font.bold: true
+            font.bold:  true
+            textFormat: Text.PlainText
             Layout.alignment: Qt.AlignHCenter
         }
 
         Label {
-            id: statusLabel
-            text: "value: 0  |  idle"
+            id:         statusLabel
+            text:       "value: 0  |  idle"
+            textFormat: Text.PlainText
             Layout.alignment: Qt.AlignHCenter
         }
 

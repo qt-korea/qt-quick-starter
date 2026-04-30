@@ -4,6 +4,7 @@ import App.UiKit
 import App.Core
 
 Window {
+    id: root
     width: 480
     height: 800
     visible: true

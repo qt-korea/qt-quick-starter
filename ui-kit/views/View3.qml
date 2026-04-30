@@ -9,10 +9,8 @@ ViewBase {
     View3Form {
         anchors.fill: parent
 
-        statusText: "value: " + root.viewModel.value
-                  + "  |  " + root.viewModel.status
-                  + "  |  enters: " + root.viewModel.enterCount
+        statusText: root.statusSummary
 
-        backBtn.onClicked: root.StackView.view.pop()
+        backBtn.onClicked: if (root.StackView.view) root.StackView.view.pop()
     }
 }

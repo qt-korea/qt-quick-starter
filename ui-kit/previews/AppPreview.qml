@@ -1,8 +1,8 @@
 import QtQuick
-import QtQuick.Window
 import "../forms"
 
 Window {
+    id: root
     width: 480
     height: 800
     visible: true
