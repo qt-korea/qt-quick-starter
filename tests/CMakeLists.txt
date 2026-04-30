@@ -14,7 +14,7 @@ qt_add_executable(tst_ui_kit
     ui-visual/main.cpp
 )
 target_link_libraries(tst_ui_kit
-    PRIVATE Qt6::QuickTest Qt6::Qml ui_kit_module
+    PRIVATE Qt6::QuickTest Qt6::Qml ui_kit_module ui_kit_moduleplugin
 )
 add_test(NAME tst_ui_kit
          COMMAND tst_ui_kit -input ${CMAKE_CURRENT_SOURCE_DIR}/ui-visual)

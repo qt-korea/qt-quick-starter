@@ -1,7 +1,6 @@
-qt_add_qml_module(app_viewmodels
+qt_add_qml_module(app_viewmodels STATIC
     URI App.ViewModels
     VERSION 1.0
-    NO_PLUGIN
     OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml/App/ViewModels"
 
     SOURCES

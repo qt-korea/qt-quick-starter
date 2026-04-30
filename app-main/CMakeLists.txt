@@ -24,7 +24,9 @@ target_link_libraries(qt-quick-starter
         Qt6::QuickControls2
         app_domain
         app_viewmodels
+        app_viewmodelsplugin
         ui_kit_module
+        ui_kit_moduleplugin
 )
 
 set_target_properties(qt-quick-starter PROPERTIES
