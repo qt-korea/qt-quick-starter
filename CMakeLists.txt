@@ -38,16 +38,8 @@ if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
-install(TARGETS
-    qt-quick-starter
-    app_viewmodels
-    ui_kit_module
+install(TARGETS qt-quick-starter
+    BUNDLE  DESTINATION .
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-install(DIRECTORY "${CMAKE_BINARY_DIR}/qml/"
-    DESTINATION qml
 )
 

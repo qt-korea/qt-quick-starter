@@ -1,4 +1,3 @@
-#include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -16,11 +15,7 @@ int main(int argc, char **argv)
 
     QQmlApplicationEngine engine;
 
-    // TODO: Revisit this manual QML import path once the startup script configures QML imports.
-    engine.addImportPath(QDir(app.applicationDirPath()).absoluteFilePath(QStringLiteral("../qml")));
-
-    auto *vm = engine.singletonInstance<AppDataViewModel *>(
-        "App.ViewModels", "AppDataViewModel");
+    auto *vm = engine.singletonInstance<AppDataViewModel *>("App.ViewModels", "AppDataViewModel");
 
     if (!vm) {
         qCritical() << "[main] Failed to obtain AppDataViewModel singleton";

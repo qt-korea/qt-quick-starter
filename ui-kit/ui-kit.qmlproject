@@ -18,7 +18,6 @@ Project {
 
     QmlFiles { directory: "components" }
     QmlFiles { directory: "forms" }
-    QmlFiles { directory: "views" }
     QmlFiles { directory: "previews" }
 
     importPaths: [ "." ]
