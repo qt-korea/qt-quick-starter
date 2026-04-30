@@ -77,6 +77,29 @@ namespace**:
 
 ---
 
+## A note on scope — when this branch may be too much
+
+This branch ships per-page ViewModels constructed by a small
+`ViewNavigator`, six lifecycle hooks, an `AppServices` injection
+struct, and an explicit `core/` folder. That structure earns its
+weight on projects with many pages, page-scoped state, or growing
+domain wiring — places where a single shared ViewModel would
+eventually become the project's largest merge-conflict surface.
+
+For smaller projects (roughly five or six pages, mostly shared state),
+the sibling branch `main` may be a better starting point. It applies
+the same structural rules — UI / logic split, host-testable UI, Figma
+bridge, modular CMake — but with a single shared `AppDataViewModel`
+`QML_SINGLETON` instead of per-page ViewModels. Roughly 30 files
+instead of 50, four `CMakeLists.txt` instead of five, and less
+vocabulary to learn upfront.
+
+The two branches are siblings, not generations. Pick the one whose
+shape matches the project you are starting today; switch later if the
+project outgrows it.
+
+---
+
 ## The five layers
 
 ### Layer 1 — `core/` — reusable infrastructure (C++ QML module)

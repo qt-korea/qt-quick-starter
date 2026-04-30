@@ -39,6 +39,12 @@ This template gives you, on day one:
 This is not a finished application. It is a small amount of scaffolding,
 deliberately minimal, designed to be the first commit of a real project.
 
+> **Smaller project?** A sibling branch — `main` — applies the same
+> structural rules but with a single shared `AppDataViewModel`
+> `QML_SINGLETON` instead of per-page ViewModels. Reach for it when ~5–6
+> pages is enough and the extra vocabulary (`ViewNavigator`,
+> `AppServices`, lifecycle hooks) feels heavier than your project needs.
+
 ---
 
 ## Why "Starter"
