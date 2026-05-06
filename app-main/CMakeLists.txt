@@ -31,3 +31,15 @@ set_target_properties(qt-quick-starter PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
+
+install(TARGETS qt-quick-starter
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    BUNDLE  DESTINATION .
+)
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/app-main/App/Integration/"
+    DESTINATION "${QQS_QML_INSTALL_DIR}/App/Integration"
+    FILES_MATCHING
+        PATTERN "qmldir"
+        PATTERN "*.qmltypes"
+)

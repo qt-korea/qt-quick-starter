@@ -8,7 +8,7 @@
 //
 //  In small projects this single-singleton pattern is the simplest thing
 //  that works. As the page count grows, consider the per-page ViewModel
-//  pattern on the `feature/routed-viewmodels` branch instead.
+//  pattern on the `view-navigator` branch instead.
 // =============================================================================
 
 #pragma once

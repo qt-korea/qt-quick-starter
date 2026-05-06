@@ -22,6 +22,11 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 option(BUILD_TESTING "Build unit and UI tests" ON)
 
+include(GNUInstallDirs)
+
+set(QQS_QML_INSTALL_DIR "qml"
+    CACHE STRING "Where QML modules are installed (relative to CMAKE_INSTALL_PREFIX)")
+
 add_subdirectory(domain)
 add_subdirectory(viewmodels)
 add_subdirectory(ui-kit)
@@ -37,17 +42,3 @@ if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
 endif()
-
-install(TARGETS
-    qt-quick-starter
-    app_viewmodels
-    ui_kit_module
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-install(DIRECTORY "${CMAKE_BINARY_DIR}/qml/"
-    DESTINATION qml
-)
-

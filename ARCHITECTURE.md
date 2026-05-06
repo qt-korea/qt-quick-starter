@@ -289,6 +289,130 @@ internalised every option of `qt_add_qml_module` yet.
 
 ---
 
+## Deployment
+
+The template ships with explicit `install(...)` rules so that
+`cmake --install` produces a deployment tree ready to copy onto an
+embedded target (Boot2Qt-style devices, custom Yocto images, or any
+Linux sysroot that already has Qt installed).
+
+### What the install layout looks like
+
+After `cmake --install build --prefix /opt/qt-quick-starter`:
+
+```text
+/opt/qt-quick-starter/
+├── bin/
+│   └── qt-quick-starter             # executable, with App.Integration
+│                                   # QML embedded as a resource
+├── lib/                            # (or lib64/, see GNUInstallDirs)
+│   └── libapp_viewmodels.so        # C++ backing for App.ViewModels
+└── qml/
+    └── App/
+        ├── Integration/
+        │   └── qmldir                  # module-discovery metadata
+        ├── UiKit/
+        │   ├── qmldir
+        │   ├── ui_kit_module.qmltypes
+        │   └── libui_kit_moduleplugin.so
+        └── ViewModels/
+            ├── qmldir
+            ├── app_viewmodels.qmltypes
+            └── libapp_viewmodelsplugin.so
+```
+
+Qt itself (the QtQuick / QtQuick.Controls / QtQuick.Layouts modules) is
+not part of this tree. The deployment assumes Qt is already installed on
+the device image — which is the case for any Boot2Qt build, and for
+custom Yocto images that include the Qt layer. If you need to ship Qt
+too, that is a different deployment tool's job (`qt_generate_deploy_app_script`,
+`windeployqt`, etc.); this template stays out of that.
+
+### Why per-module install rules instead of a single top-level block
+
+Each layer's `CMakeLists.txt` declares its own install rules, next to the
+target definition. The same way each layer is responsible for its own
+build rules, each layer is responsible for its own deployment rules.
+When you add a new module by copying `viewmodels/CMakeLists.txt`, the
+install lines come along with it — there is no separate file to remember
+to edit.
+
+The top-level `CMakeLists.txt` only sets two things related to install:
+
+- `include(GNUInstallDirs)` — portable directory variables
+  (`CMAKE_INSTALL_BINDIR`, `CMAKE_INSTALL_LIBDIR`) that adapt to the
+  target distribution. On systems where 64-bit libraries live in `lib64`
+  (Fedora, RHEL), `CMAKE_INSTALL_LIBDIR` resolves to `lib64`; on Debian,
+  Ubuntu, and most embedded sysroots it resolves to `lib`. Hard-coding
+  `"lib"` works for embedded use but breaks Linux desktop packaging.
+- `QQS_QML_INSTALL_DIR` — a single cache variable for where QML modules
+  go. Defaults to `qml`; override with
+  `cmake -DQQS_QML_INSTALL_DIR=share/qt6/qml ...` if your sysroot uses a
+  different convention.
+
+### Why .qml source files are not deployed
+
+`qt_add_qml_module` compiles every `.qml` and `.ui.qml` in `QML_FILES`
+into the plugin shared library and embeds them as Qt resources. The
+generated `qmldir` contains:
+
+```text
+prefer :/qt/qml/App/UiKit/
+```
+
+which tells the QML engine to load the embedded copies in preference to
+anything on disk. Source `.qml` files alongside the plugin would be
+ignored at runtime — so the install rules deliberately exclude them and
+ship only the artefacts the engine actually loads:
+
+- `qmldir` — module-discovery metadata
+- `*.qmltypes` — type information for tooling (small, included for
+  on-device debugging convenience; not strictly required at runtime)
+- the plugin shared library
+
+This keeps the deployed tree minimal and makes "what runs on the device"
+clearer.
+
+If you ever need source `.qml` on the device for live-reload debugging or
+for Qt Design Studio's connect-to-device preview, add `*.qml` and
+`*.ui.qml` back to the `FILES_MATCHING` patterns for that session. For
+production images, leave them out.
+
+### Why the static library has no install rule
+
+`app_domain` is a `STATIC` library: its object code is linked directly
+into every target that depends on it (the executable and
+`app_viewmodels`). There is no separate `.so` to ship — the domain code
+already travels inside whatever links it. `domain/CMakeLists.txt`
+therefore has no `install()` block. If you ever switch `app_domain` to
+`SHARED`, add an `install(TARGETS app_domain ...)` block matching the
+one in `viewmodels/CMakeLists.txt`.
+
+### How the executable finds QML modules at runtime
+
+`main.cpp` calls:
+
+```cpp
+engine.addImportPath(
+    QDir(app.applicationDirPath()).absoluteFilePath("../qml"));
+```
+
+This resolves to `<install-prefix>/qml/` based on the executable's own
+location, not on environment variables. The deployed binary works
+wherever the install tree lands — no launcher script setting
+`QML_IMPORT_PATH`, no systemd unit threading environment through, no
+`/etc/profile.d/` hook. A self-contained tarball or a single rsync of
+the install tree is enough to run.
+
+This path expression assumes the install layout above (`bin/` next to
+`qml/`). If you change the install layout, change this line to match —
+it is the one place the executable is told how to find QML modules.
+The expression also resolves correctly inside the build tree, so
+launching from `build/app-main/qt-quick-starter` during development
+works without an install step.
+
+---
+
 ## The host-testable UI workflow
 
 > **`ui-kit/forms/` is the developer's workspace for UI iteration. Every

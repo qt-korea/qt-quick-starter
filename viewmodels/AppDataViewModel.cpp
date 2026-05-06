@@ -1,11 +1,3 @@
-// =============================================================================
-//  viewmodels/AppDataViewModel.cpp
-//
-//  The constructor sets the object name once. All log lines below use
-//  objectName() instead of a hardcoded string, so renaming the class only
-//  requires updating the setObjectName() call.
-// =============================================================================
-
 #include "AppDataViewModel.h"
 #include "AppDataSource.h"
 

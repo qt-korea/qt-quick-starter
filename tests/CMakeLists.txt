@@ -1,6 +1,5 @@
 find_package(Qt6 REQUIRED COMPONENTS Test QuickTest)
 
-# ── Domain unit test (no display needed) ─────────────────────────────────────
 qt_add_executable(tst_app_datasource
     domain/tst_app_datasource.cpp
 )
@@ -9,7 +8,6 @@ target_link_libraries(tst_app_datasource
 )
 add_test(NAME tst_app_datasource COMMAND tst_app_datasource)
 
-# ── UI visual test via QtQuickTest ───────────────────────────────────────────
 qt_add_executable(tst_ui_kit
     ui-visual/main.cpp
 )
